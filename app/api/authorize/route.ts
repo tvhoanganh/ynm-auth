@@ -1,14 +1,11 @@
 import { generateCodeVerifier } from "@/utils/pkce";
 import { setUserToken } from "@/utils/stograte";
 import { NextRequest, NextResponse } from "next/server";
-import { redirect } from "next/navigation";
 
 const SL_API_URL = process.env.SL_API_URL || "http://api-testing.ynm.local";
 
 export async function POST(req: NextRequest) {
   const { email, password, oauth } = await req.json();
-
-  const { flow } = oauth;
 
   const userLodged = await fetch(`${SL_API_URL}/authentication`, {
     method: "POST",
