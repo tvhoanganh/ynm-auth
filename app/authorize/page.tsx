@@ -72,32 +72,32 @@ function AuthorizeForm() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col sm:flex-row items-stretch bg-gradient-to-br from-indigo-100 via-sky-100 to-pink-100 dark:from-zinc-900 dark:via-zinc-950 dark:to-black">
+    <div className="min-h-screen flex flex-col sm:flex-row items-stretch bg-gradient-to-br from-blue-50 via-blue-50 to-indigo-100">
       {/* Left: Landing info */}
-      <div className="flex-1 flex flex-col justify-center items-center px-6 py-12 sm:py-0 bg-white/70 dark:bg-zinc-900/80 border-b-2 sm:border-b-0 sm:border-r-2 border-zinc-200 dark:border-zinc-800 shadow-lg">
+      <div className="flex-1 flex flex-col justify-center items-center px-4 py-12 sm:py-0 bg-white border-b-2 sm:border-b-0 sm:border-r-2 border-gray-200 shadow-lg">
         <div className="max-w-md w-full flex flex-col items-center gap-6">
-          <h1 className="text-4xl font-extrabold text-zinc-900 dark:text-zinc-50 text-center leading-tight drop-shadow-sm">
+          <h1 className="text-4xl font-extrabold text-gray-900 text-center leading-tight drop-shadow-sm">
             YNM Auth
           </h1>
-          <p className="text-lg text-zinc-600 dark:text-zinc-300 text-center max-w-xs">
+          <p className="text-lg text-gray-600 text-center max-w-xs">
             Đăng nhập một chạm, bảo mật tuyệt đối.
             <br />
-            <span className="font-semibold text-indigo-600 dark:text-pink-400">
+            <span className="font-semibold text-blue-600">
               Bảo vệ tài khoản của bạn
             </span>{" "}
             với hệ thống xác thực hiện đại.
           </p>
-          <ul className="text-zinc-500 dark:text-zinc-400 text-sm flex flex-col gap-2 mt-2">
+          <ul className="text-gray-500 text-sm flex flex-col gap-2 mt-2">
             <li className="flex items-center gap-2">
-              <span className="inline-block w-2 h-2 bg-indigo-400 rounded-full"></span>{" "}
+              <span className="inline-block w-2 h-2 bg-blue-400 rounded-full"></span>{" "}
               Đăng nhập nhanh chóng
             </li>
             <li className="flex items-center gap-2">
-              <span className="inline-block w-2 h-2 bg-pink-400 rounded-full"></span>{" "}
+              <span className="inline-block w-2 h-2 bg-indigo-400 rounded-full"></span>{" "}
               Bảo mật chuẩn OAuth 2.0
             </li>
             <li className="flex items-center gap-2">
-              <span className="inline-block w-2 h-2 bg-sky-400 rounded-full"></span>{" "}
+              <span className="inline-block w-2 h-2 bg-cyan-400 rounded-full"></span>{" "}
               Hỗ trợ đa nền tảng
             </li>
           </ul>
@@ -106,27 +106,27 @@ function AuthorizeForm() {
       {/* Right: Login form */}
       <div className="flex-1 flex flex-col justify-center items-center px-4 sm:px-8 py-12 bg-transparent">
         <form
-          className="flex flex-col gap-6 rounded-2xl bg-white/90 dark:bg-zinc-900/90 p-8 shadow-2xl min-w-[320px] max-w-[95vw] w-full sm:w-[370px] border border-zinc-200 dark:border-zinc-800 backdrop-blur"
+          className="flex flex-col gap-6 rounded-2xl bg-white p-8 shadow-2xl min-w-[320px] max-w-[95vw] w-full sm:w-[370px] border border-gray-200 backdrop-blur"
           onSubmit={handleSubmit}
         >
           <div className="flex flex-col items-center gap-2 mb-2">
-            <h2 className="text-2xl font-extrabold text-center text-zinc-900 dark:text-zinc-50 tracking-tight">
+            <h2 className="text-2xl font-extrabold text-center text-gray-900 tracking-tight">
               Đăng nhập tài khoản
             </h2>
-            <span className="text-xs text-zinc-500 dark:text-zinc-400">
+            <span className="text-xs text-gray-500">
               Vui lòng nhập thông tin để tiếp tục
             </span>
           </div>
           <div className="flex flex-col gap-3">
             <label
-              className="text-sm font-medium text-zinc-700 dark:text-zinc-200"
+              className="text-sm font-medium text-gray-700"
               htmlFor="username"
             >
               Tên đăng nhập
             </label>
             <input
               id="email"
-              className="rounded-lg border border-zinc-300 dark:border-zinc-700 px-3 py-2 text-base text-zinc-900 dark:bg-zinc-800 dark:text-zinc-50 focus:outline-none focus:ring-2 focus:ring-indigo-400 dark:focus:ring-indigo-600 transition"
+              className="rounded-lg border border-gray-300 px-3 py-2 text-base text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
               type="text"
               placeholder="Tên đăng nhập"
               value={email}
@@ -137,14 +137,14 @@ function AuthorizeForm() {
           </div>
           <div className="flex flex-col gap-3">
             <label
-              className="text-sm font-medium text-zinc-700 dark:text-zinc-200"
+              className="text-sm font-medium text-gray-700"
               htmlFor="password"
             >
               Mật khẩu
             </label>
             <input
               id="password"
-              className="rounded-lg border border-zinc-300 dark:border-zinc-700 px-3 py-2 text-base text-zinc-900 dark:bg-zinc-800 dark:text-zinc-50 focus:outline-none focus:ring-2 focus:ring-indigo-400 dark:focus:ring-indigo-600 transition"
+              className="rounded-lg border border-gray-300 px-3 py-2 text-base text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
               type="password"
               placeholder="Mật khẩu (123456)"
               value={password}
@@ -153,13 +153,13 @@ function AuthorizeForm() {
             />
           </div>
           {error && (
-            <div className="text-red-500 text-sm text-center rounded bg-red-50 dark:bg-zinc-800/60 py-2 px-3 border border-red-200 dark:border-zinc-700 animate-shake">
+            <div className="text-red-600 text-sm text-center rounded bg-red-50 py-2 px-3 border border-red-200 animate-shake">
               {error}
             </div>
           )}
           <button
             type="submit"
-            className="rounded-lg bg-gradient-to-r from-indigo-500 to-pink-500 text-white py-2 font-semibold shadow-md hover:from-indigo-600 hover:to-pink-600 transition-colors disabled:opacity-60 mt-2"
+            className="rounded-lg bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-2 font-semibold shadow-md hover:from-blue-700 hover:to-indigo-700 transition-colors disabled:opacity-60 mt-2"
             disabled={loading}
           >
             {loading ? (
