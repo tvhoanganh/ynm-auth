@@ -27,16 +27,15 @@ export default async function LoginPage({
 }) {
   const cookieStore = await cookies();
   const parramsResolved = await searchParams;
-  const session = cookieStore.get("session_sso")?.value || "";
+  const { value: session = "" } = cookieStore.get("session_sso") || {};
+  const userEmail = session.split("-").at(-1) || "";
 
   if (checkValidationSSO(session) && parramsResolved.flow === "redirect") {
     const authorization_code = generateCodeVerifier();
 
     storeAuthorizationCode(authorization_code, parramsResolved.code_challenge);
-    storeAuthorizationEmail(
-      authorization_code,
-      session.split("-").at(-1) || ""
-    );
+    storeAuthorizationEmail(authorization_code, userEmail);
+    
     redirect(`${parramsResolved.redirect_uri}?code=${authorization_code}`);
   }
 
