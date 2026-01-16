@@ -13,7 +13,7 @@ import {
 } from "@/utils/authorizationCodeStorage";
 import { stringify } from "querystring";
 
-const checkValidationSSO = (session_sso: string) => {
+export const checkValidationSSO = (session_sso: string) => {
   return session_sso;
 };
 
@@ -24,7 +24,6 @@ export default async function SuccessPage({
 }) {
   const cookieStore = await cookies();
   const parramsResolved = await searchParams;
-  console.log("=> ~ SuccessPage ~ parramsResolved:", parramsResolved);
   const session = cookieStore.get("session_sso")?.value || "";
   if (!checkValidationSSO(session)) {
     redirect(`/authoerize?${stringify(parramsResolved)}`);

@@ -3,7 +3,13 @@ import { Suspense } from "react";
 import { AuthorizeForm } from "./_components/AuthorizeForm";
 import { cookies } from "next/headers";
 import { redirect, RedirectType } from "next/navigation";
-import qs from "qs";
+import { stringify } from "qs";
+import { checkValidationSSO } from "./success/page";
+import { generateCodeVerifier } from "@/utils/pkce";
+import {
+  storeAuthorizationCode,
+  storeAuthorizationEmail,
+} from "@/utils/authorizationCodeStorage";
 
 export default async function LoginPage({
   searchParams,
@@ -21,11 +27,22 @@ export default async function LoginPage({
 }) {
   const cookieStore = await cookies();
   const parramsResolved = await searchParams;
-  const session = cookieStore.get("session_sso")?.value;
+  const session = cookieStore.get("session_sso")?.value || "";
+
+  if (checkValidationSSO(session) && parramsResolved.flow === "redirect") {
+    const authorization_code = generateCodeVerifier();
+
+    storeAuthorizationCode(authorization_code, parramsResolved.code_challenge);
+    storeAuthorizationEmail(
+      authorization_code,
+      session.split("-").at(-1) || ""
+    );
+    redirect(`${parramsResolved.redirect_uri}?code=${authorization_code}`);
+  }
 
   if (session) {
     redirect(
-      `/authorize/success?${qs.stringify(parramsResolved)}`,
+      `/authorize/success?${stringify(parramsResolved)}`,
       RedirectType.push
     );
   }
