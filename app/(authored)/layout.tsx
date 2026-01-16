@@ -88,7 +88,7 @@ export default function AuthenticatedLayout({
         <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
           {/* Logo */}
           <div className="flex items-center">
-            <span className="text-lg font-semibold text-gray-900">Auth App</span>
+            <span className="text-lg font-semibold text-gray-900">Auth Account</span>
           </div>
 
           {/* Mobile menu button */}

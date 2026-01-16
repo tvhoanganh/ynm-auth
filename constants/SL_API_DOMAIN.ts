@@ -1,0 +1,1 @@
+export const SL_API_URL = process.env.SL_API_URL || "http://api-testing.ynm.local";
