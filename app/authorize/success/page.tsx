@@ -13,7 +13,7 @@ import {
 } from "@/utils/authorizationCodeStorage";
 import { stringify } from "querystring";
 
-export const checkValidationSSO = (session_sso: string) => {
+const checkValidationSSO = (session_sso: string) => {
   return session_sso;
 };
 

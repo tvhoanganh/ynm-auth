@@ -62,7 +62,7 @@ export function AuthorizeForm() {
           type: "oauth-code",
           code: data.code,
         },
-        client_id
+        client_id,
       );
 
       window.close();
@@ -73,18 +73,18 @@ export function AuthorizeForm() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col sm:flex-row items-stretch bg-gradient-to-br from-blue-50 via-blue-50 to-indigo-100">
+    <div className="min-h-screen flex flex-col sm:flex-row items-stretch from-blue-50 via-blue-50 to-indigo-100">
       {/* Left: Landing info */}
       <div className="flex-1 flex flex-col justify-center items-center px-4 py-12 sm:py-0 bg-white border-b-2 sm:border-b-0 sm:border-r-2 border-gray-200 shadow-lg">
         <div className="max-w-lg w-full flex flex-col items-center gap-6">
           <h1 className="text-4xl font-extrabold text-gray-900 text-center leading-tight drop-shadow-sm">
             YNM Account
           </h1>
-          <p className="text-lg text-gray-600 text-center max-w-xs">
+          <p className="text-lg text-gray-600 text-center max-w-md">
             Đăng nhập một chạm, bảo mật tuyệt đối.
             <br />
             <span className="font-semibold text-blue-600">
-              Bảo vệ tài khoản của bạn
+              Bảo vệ tài khoản của bạn <br />
             </span>{" "}
             với hệ thống xác thực hiện đại.
           </p>

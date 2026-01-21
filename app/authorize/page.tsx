@@ -4,12 +4,15 @@ import { AuthorizeForm } from "./_components/AuthorizeForm";
 import { cookies } from "next/headers";
 import { redirect, RedirectType } from "next/navigation";
 import { stringify } from "qs";
-import { checkValidationSSO } from "./success/page";
 import { generateCodeVerifier } from "@/utils/pkce";
 import {
   storeAuthorizationCode,
   storeAuthorizationEmail,
 } from "@/utils/authorizationCodeStorage";
+
+const checkValidationSSO = (session_sso: string) => {
+  return session_sso;
+};
 
 export default async function LoginPage({
   searchParams,
@@ -35,7 +38,7 @@ export default async function LoginPage({
 
     storeAuthorizationCode(authorization_code, parramsResolved.code_challenge);
     storeAuthorizationEmail(authorization_code, userEmail);
-    
+
     redirect(`${parramsResolved.redirect_uri}?code=${authorization_code}`);
   }
 
