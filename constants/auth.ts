@@ -1,5 +1,6 @@
 export const SESSION_COOKIE_NAME = "session_sso";
 export const ACCESS_TOKEN_COOKIE_NAME = "access_token";
+export const SL_API_TOKEN_COOKIE_NAME = "sl_api_token";
 
 export const JWT_ISSUER = "ynm-auth";
 export const JWT_EXPIRES_IN_SECONDS = 60 * 60;

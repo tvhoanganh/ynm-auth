@@ -1,3 +1,19 @@
+/**
+ * @deprecated Use JwtService from '@/lib/services' instead
+ * This file is kept for backward compatibility only
+ * 
+ * Migration example:
+ * // Old way (deprecated):
+ * import { signJwt, verifyJwt } from '@/utils/jwt';
+ * const token = await signJwt(payload, secret);
+ * 
+ * // New way (recommended):
+ * import { container } from '@/lib/di-container';
+ * import { JwtService } from '@/lib/services';
+ * const jwtService = container.resolve(JwtService);
+ * const token = await jwtService.signJwt(payload, secret);
+ */
+
 import { SignJWT, jwtVerify, type JWTPayload } from "jose";
 
 type JwtPayload = JWTPayload & Record<string, unknown>;

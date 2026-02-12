@@ -1,7 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { UserProfile } from "@/app/types/UserProfile";
+import { useEffect, useState } from "react";
 import { BlurDecoration } from "@/components/ui/BlurDecoration";
 import { ProfileField } from "./_components/ProfileField";
 import { UserAvatar } from "./_components/UserAvatar";
@@ -9,55 +8,26 @@ import { InfoBadge } from "./_components/InfoBadge";
 import { FormattedDate } from "./_components/FormattedDate";
 import { ProfileMessage } from "./_components/ProfileMessage";
 import { ProfileLoadingState } from "./_components/ProfileLoadingState";
-
-const MOCK_PROFILE: UserProfile = {
-  id: 5867,
-  fullname: "AnhTVH",
-  email: "anhtvh@younetgroup.com",
-  phone: "0123456785",
-  department: "pr",
-  company_name: "Younet",
-  status: "active",
-  last_login: "2026-01-14 08:03:32",
-  avatar_url:
-    "http://api-testing.ynm.local/uploads/9dc7b0bfe4536ab5a346d08c332970efabe6d7f0e1457a5dd5121131d01fe4a5.png",
-  verified: 1,
-  younet_company: "YouNet Media",
-};
+import { UserProfile } from "@/types/UserProfile";
+import { useUser } from "../_components/UserContext";
 
 export default function ProfilePage() {
+  const { user, isLoading, error, refresh } = useUser();
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [editedProfile, setEditedProfile] = useState<Partial<UserProfile>>({});
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
-  const [isMounted, setIsMounted] = useState(false);
   const [message, setMessage] = useState<{
     type: "success" | "error";
     text: string;
   } | null>(null);
 
   useEffect(() => {
-    setIsMounted(true);
-    const fetchProfile = async () => {
-      try {
-        const res = await fetch("/api/userinfo", {
-          method: "GET",
-          headers: { "Content-Type": "application/json" },
-        });
-        if (!res.ok) {
-          throw new Error(`API error: ${res.status}`);
-        }
-        const data: UserProfile = await res.json();
-        setProfile(data);
-        setEditedProfile(data);
-      } catch (err) {
-        console.error("Failed to fetch profile:", err);
-        setProfile(MOCK_PROFILE);
-        setEditedProfile(MOCK_PROFILE);
-      }
-    };
-    fetchProfile();
-  }, []);
+    if (user) {
+      setProfile(user);
+      setEditedProfile(user);
+    }
+  }, [user]);
 
   const handleFieldChange = (id: string, value: string | number) => {
     setEditedProfile((prev) => ({ ...prev, [id]: value }));
@@ -77,6 +47,7 @@ export default function ProfilePage() {
         setIsEditing(false);
         setMessage({ type: "success", text: "Cập nhật thông tin thành công!" });
         setTimeout(() => setMessage(null), 3000);
+        await refresh();
       } else {
         setMessage({ type: "error", text: "Có lỗi khi cập nhật thông tin" });
       }
@@ -93,8 +64,28 @@ export default function ProfilePage() {
     setMessage(null);
   };
 
-  if (!profile || !isMounted) {
+  if (isLoading || !profile) {
     return <ProfileLoadingState />;
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex items-center justify-center px-4">
+        <div className="w-full max-w-md bg-white dark:bg-slate-900/80 border border-slate-200/60 dark:border-slate-700/60 rounded-2xl p-6 text-center">
+          <ProfileMessage
+            type="error"
+            text={error || "Không thể tải thông tin người dùng"}
+          />
+          <button
+            type="button"
+            onClick={refresh}
+            className="mt-4 w-full px-4 py-2.5 rounded-xl bg-emerald-600 text-white font-medium hover:bg-emerald-700 transition-colors"
+          >
+            Thử lại
+          </button>
+        </div>
+      </div>
+    );
   }
 
   return (
