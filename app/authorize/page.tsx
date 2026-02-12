@@ -1,6 +1,6 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Suspense } from "react";
 import { AuthorizeForm } from "./_components/AuthorizeForm";
+import { AuthorizeBranding } from "./_components/AuthorizeBranding";
 import { cookies } from "next/headers";
 import { redirect, RedirectType } from "next/navigation";
 import { stringify } from "qs";
@@ -9,12 +9,14 @@ import {
   storeAuthorizationCode,
   storeAuthorizationEmail,
 } from "@/utils/authorizationCodeStorage";
+import { FLOW_REDIRECT } from "@/constants/oauth";
+import { Spinner } from "@/components/ui/Spinner";
 
-const checkValidationSSO = (session_sso: string) => {
-  return session_sso;
-};
+function checkValidationSSO(sessionSso: string) {
+  return Boolean(sessionSso);
+}
 
-export default async function LoginPage({
+export default async function AuthorizePage({
   searchParams,
 }: {
   searchParams: Promise<{
@@ -29,29 +31,41 @@ export default async function LoginPage({
   }>;
 }) {
   const cookieStore = await cookies();
-  const parramsResolved = await searchParams;
+  const paramsResolved = await searchParams;
   const { value: session = "" } = cookieStore.get("session_sso") || {};
   const userEmail = session.split("-").at(-1) || "";
 
-  if (checkValidationSSO(session) && parramsResolved.flow === "redirect") {
-    const authorization_code = generateCodeVerifier();
-
-    storeAuthorizationCode(authorization_code, parramsResolved.code_challenge);
-    storeAuthorizationEmail(authorization_code, userEmail);
-
-    redirect(`${parramsResolved.redirect_uri}?code=${authorization_code}`);
+  if (checkValidationSSO(session) && paramsResolved.flow === FLOW_REDIRECT) {
+    const authorizationCode = generateCodeVerifier();
+    storeAuthorizationCode(authorizationCode, paramsResolved.code_challenge);
+    storeAuthorizationEmail(authorizationCode, userEmail);
+    redirect(`${paramsResolved.redirect_uri}?code=${authorizationCode}`);
   }
 
   if (session) {
     redirect(
-      `/authorize/success?${stringify(parramsResolved)}`,
-      RedirectType.push
+      `/authorize/success?${stringify(paramsResolved)}`,
+      RedirectType.push,
     );
   }
 
   return (
-    <Suspense>
-      <AuthorizeForm />
-    </Suspense>
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex flex-col lg:flex-row">
+      <Suspense
+        fallback={
+          <div className="min-h-screen flex items-center justify-center">
+            <div className="flex flex-col items-center gap-4">
+              <Spinner size="lg" />
+              <p className="text-sm text-slate-500 dark:text-slate-400">
+                Đang tải...
+              </p>
+            </div>
+          </div>
+        }
+      >
+        <AuthorizeBranding />
+        <AuthorizeForm />
+      </Suspense>
+    </div>
   );
 }
