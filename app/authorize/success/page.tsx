@@ -2,14 +2,13 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
 import Callback from "./_components/Callback";
-import { generateCodeVerifier } from "@/utils/pkce";
-import { OauthOptions } from "@/app/types/OauthOptions";
-import {
-  storeAuthorizationCode,
-  storeAuthorizationEmail,
-} from "@/utils/authorizationCodeStorage";
 import { stringify } from "querystring";
 import { Spinner } from "@/components/ui/Spinner";
+import { OauthOptions } from "@/types/OauthOptions";
+import { container } from "@/services/di-container";
+
+
+import { PkceService, SsoService } from "@/services";
 
 function checkValidationSSO(sessionSso: string) {
   return Boolean(sessionSso);
@@ -27,13 +26,14 @@ export default async function AuthorizeSuccessPage({
   if (!checkValidationSSO(session)) {
     redirect(`/authorize?${stringify(paramsResolved)}`);
   }
-
-  const authorizationCode = generateCodeVerifier();
-  storeAuthorizationCode(authorizationCode, paramsResolved.code_challenge);
-  storeAuthorizationEmail(
-    authorizationCode,
-    session.split("-").at(-1) || "",
-  );
+  const pkceService = container.resolve(PkceService);
+  const ssoService = container.resolve(SsoService);
+  const authorizationCode = pkceService.generateCodeVerifier();
+  
+  await ssoService.storeAuthorizationData(authorizationCode, {
+    email: session.split("-").at(-1) || "",
+    codeChallenge: paramsResolved.code_challenge,
+  });
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex flex-col items-center justify-center px-4 py-12">

@@ -5,7 +5,7 @@ import {
   JWT_ISSUER,
   JWT_SECRET,
 } from "@/constants/auth";
-import { SlApiAuthResponse } from "@/app/types/ISLApiAuthResponse";
+import { SlApiAuthResponse } from "@/types/ISLApiAuthResponse";
 
 export type UserData = SlApiAuthResponse["user"];
 
@@ -28,17 +28,14 @@ export class LoginService {
     }
 
     const now = Math.floor(Date.now() / 1000);
-    return this.jwtService.signJwt(
-      {
-        sub: String(user.id),
-        email: user.email,
-        name: user.name,
-        iss: JWT_ISSUER,
-        iat: now,
-        exp: now + JWT_EXPIRES_IN_SECONDS,
-      },
-      JWT_SECRET,
-    );
+    return this.jwtService.signJwt({
+      sub: String(user.id),
+      email: user.email,
+      name: user.name,
+      iss: JWT_ISSUER,
+      iat: now,
+      exp: now + JWT_EXPIRES_IN_SECONDS,
+    });
   }
 
   /**

@@ -7,3 +7,6 @@ export { AuthService } from "./AuthService";
 export { UserService } from "./UserService";
 export { JwtService } from "./JwtService";
 export { LoginService } from "./LoginService";
+export { PkceService } from "./PkceService";
+export { RedisService } from "./RedisService";
+export { SsoService } from "./SsoService";

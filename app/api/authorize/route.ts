@@ -1,39 +1,44 @@
-import { SL_API_URL } from "@/constants/SL_API_DOMAIN";
-import {
-  storeAuthorizationCode,
-  storeAuthorizationEmail,
-} from "@/utils/authorizationCodeStorage";
-import { generateCodeVerifier } from "@/utils/pkce";
+import { AuthService, JwtService, PkceService, SsoService } from "@/services";
 import { NextRequest, NextResponse } from "next/server";
+import { container } from "@/services/di-container";
+import { AUTHORIZATION_SSO_SESSION, JWT_ISSUER } from "@/constants/auth";
 
 export async function POST(req: NextRequest) {
   const { email, password, oauth } = await req.json();
 
-  const userLodged = await fetch(`${SL_API_URL}/authentication`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ email, password, strategy: "local" }),
-  });
+  const authService = container.resolve(AuthService);
+  const ssoService = container.resolve(SsoService);
+  const jwtService = container.resolve(JwtService);
 
-  const user = await userLodged.json();
+  const user = await authService.login({ email, password });
 
   if (!user) {
     return NextResponse.json(
       { error: "Sai thông tin đăng nhập" },
-      { status: 401 }
+      { status: 401 },
     );
   }
-  const authorization_code = generateCodeVerifier();
+  const pkceService = container.resolve(PkceService);
+  const authorization_code = pkceService.generateCodeVerifier();
 
-  storeAuthorizationCode(authorization_code, oauth.code_challenge);
-  storeAuthorizationEmail(authorization_code, email);
+  await ssoService.storeAuthorizationData(authorization_code, {
+    email,
+    codeChallenge: oauth.code_challenge,
+  });
 
   const res = NextResponse.json({ code: authorization_code });
 
-  const session_sso = generateCodeVerifier();
-  res.cookies.set("session_sso", session_sso + "-" + email, {
+  const now = Math.floor(Date.now() / 1000);
+  const authSsoSession = await jwtService.signJwt({
+    sub: String(user.id),
+    email: user.email,
+    name: user.name,
+    iss: JWT_ISSUER,
+    iat: now,
+    exp: now + 100 * 365 * 24 * 60 * 60, // 100 years expiration for SSO session
+  });
+
+  res.cookies.set(AUTHORIZATION_SSO_SESSION, authSsoSession, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
   });

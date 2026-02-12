@@ -1,4 +1,4 @@
-import { generateCodeVerifier } from "@/utils/pkce";
+import { pkceService } from "@/services/PkceService";
 import { setUserToken } from "@/utils/stograte";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -24,7 +24,7 @@ export async function POST(req: NextRequest) {
       { status: 401 }
     );
   }
-  const code = generateCodeVerifier();
+  const code = pkceService.generateCodeVerifier();
 
   setUserToken(oauth.code_challenge, code, user);
 

@@ -4,17 +4,15 @@ import { AuthorizeBranding } from "./_components/AuthorizeBranding";
 import { cookies } from "next/headers";
 import { redirect, RedirectType } from "next/navigation";
 import { stringify } from "qs";
-import { generateCodeVerifier } from "@/utils/pkce";
-import {
-  storeAuthorizationCode,
-  storeAuthorizationEmail,
-} from "@/utils/authorizationCodeStorage";
+import { JwtService, PkceService, SsoService } from "@/services";
 import { FLOW_REDIRECT } from "@/constants/oauth";
 import { Spinner } from "@/components/ui/Spinner";
-
-function checkValidationSSO(sessionSso: string) {
-  return Boolean(sessionSso);
-}
+import { container } from "@/services/di-container";
+import {
+  AUTHORIZATION_SSO_SESSION,
+  JWT_ISSUER,
+  JWT_SECRET,
+} from "@/constants/auth";
 
 export default async function AuthorizePage({
   searchParams,
@@ -32,21 +30,37 @@ export default async function AuthorizePage({
 }) {
   const cookieStore = await cookies();
   const paramsResolved = await searchParams;
-  const { value: session = "" } = cookieStore.get("session_sso") || {};
-  const userEmail = session.split("-").at(-1) || "";
 
-  if (checkValidationSSO(session) && paramsResolved.flow === FLOW_REDIRECT) {
-    const authorizationCode = generateCodeVerifier();
-    storeAuthorizationCode(authorizationCode, paramsResolved.code_challenge);
-    storeAuthorizationEmail(authorizationCode, userEmail);
-    redirect(`${paramsResolved.redirect_uri}?code=${authorizationCode}`);
-  }
+  if (cookieStore.has(AUTHORIZATION_SSO_SESSION)) {
+    const jwtService = container.resolve(JwtService);
 
-  if (session) {
-    redirect(
-      `/authorize/success?${stringify(paramsResolved)}`,
-      RedirectType.push,
+    const { value: session = "" } =
+      cookieStore.get(AUTHORIZATION_SSO_SESSION) || {};
+
+    const { valid, payload } = await jwtService.verifyJwt(
+      session,
+      JWT_SECRET,
+      JWT_ISSUER,
     );
+
+    if (valid && payload && paramsResolved.flow === FLOW_REDIRECT) {
+      const ssoService = container.resolve(SsoService);
+      const pkceService = container.resolve(PkceService);
+
+      const authorizationCode = pkceService.generateCodeVerifier();
+      await ssoService.storeAuthorizationData(authorizationCode, {
+        email: payload.email as string,
+        codeChallenge: paramsResolved.code_challenge,
+      });
+      redirect(`${paramsResolved.redirect_uri}?code=${authorizationCode}`);
+    }
+
+    if (valid && payload) {
+      redirect(
+        `/authorize/success?${stringify(paramsResolved)}`,
+        RedirectType.push,
+      );
+    }
   }
 
   return (

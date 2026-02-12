@@ -1,4 +1,4 @@
-export const SESSION_COOKIE_NAME = "session_sso";
+export const AUTHORIZATION_SSO_SESSION = "authorization_sso_session";
 export const ACCESS_TOKEN_COOKIE_NAME = "access_token";
 export const SL_API_TOKEN_COOKIE_NAME = "sl_api_token";
 

@@ -1,3 +1,4 @@
+import { JWT_SECRET } from "@/constants/auth";
 import { SignJWT, jwtVerify, type JWTPayload } from "jose";
 import { injectable } from "tsyringe";
 
@@ -7,7 +8,7 @@ type JwtPayload = JWTPayload & Record<string, unknown>;
 export class JwtService {
   private encoder = new TextEncoder();
 
-  async signJwt(payload: JwtPayload, secret: string): Promise<string> {
+  async signJwt(payload: JwtPayload, secret: string = JWT_SECRET): Promise<string> {
     const key = this.encoder.encode(secret);
 
     return new SignJWT(payload)
@@ -17,7 +18,7 @@ export class JwtService {
 
   async verifyJwt(
     token: string,
-    secret: string,
+    secret: string = JWT_SECRET,
     issuer?: string
   ): Promise<{ valid: boolean; payload?: JwtPayload }> {
     try {

@@ -1,6 +1,6 @@
 import { injectable } from "tsyringe";
 import { SL_API_URL } from "@/constants/SL_API_DOMAIN";
-import { SlApiAuthResponse } from "@/app/types/ISLApiAuthResponse";
+import { SlApiAuthResponse } from "@/types/ISLApiAuthResponse";
 
 export interface LoginCredentials {
   email: string;
