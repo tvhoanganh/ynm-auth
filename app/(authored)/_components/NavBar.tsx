@@ -62,7 +62,18 @@ const NAV_ITEMS: NavItem[] = [
 export function NavBar() {
   const pathname = usePathname();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [loggingOut, setLoggingOut] = useState(false);
   const closeMenu = () => setIsMenuOpen(false);
+
+  const handleLogout = async () => {
+    setLoggingOut(true);
+    try {
+      await fetch("/api/auth/logout", { method: "POST" });
+      window.location.href = "/";
+    } finally {
+      setLoggingOut(false);
+    }
+  };
 
   return (
     <nav className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-md fixed w-full z-20 top-0 start-0 border-b border-slate-200/60 dark:border-slate-800 shadow-sm">
@@ -85,7 +96,7 @@ export function NavBar() {
         <div
           className={`${isMenuOpen ? "" : "hidden"} w-full md:block md:w-auto`}
         >
-          <ul className="font-medium flex flex-col p-4 md:p-0 mt-4 border border-slate-200 dark:border-slate-700 rounded-xl bg-slate-50 dark:bg-slate-800/50 md:flex-row md:gap-1 md:mt-0 md:border-0 md:bg-transparent">
+          <ul className="font-medium flex flex-col p-4 md:p-0 mt-4 border border-slate-200 dark:border-slate-700 rounded-xl bg-slate-50 dark:bg-slate-800/50 md:flex-row md:gap-1 md:mt-0 md:border-0 md:bg-transparent md:items-center">
             {NAV_ITEMS.map((item) => (
               <NavLink
                 key={item.href}
@@ -94,6 +105,16 @@ export function NavBar() {
                 onClose={closeMenu}
               />
             ))}
+            <li className="md:ml-2 mt-2 md:mt-0">
+              <button
+                type="button"
+                onClick={handleLogout}
+                disabled={loggingOut}
+                className="block w-full md:w-auto py-2 px-3 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-red-50 dark:hover:bg-red-500/10 hover:text-red-600 dark:hover:text-red-400 transition-colors md:p-2 md:px-4 disabled:opacity-50"
+              >
+                {loggingOut ? "Đang đăng xuất..." : "Đăng xuất"}
+              </button>
+            </li>
           </ul>
         </div>
       </div>

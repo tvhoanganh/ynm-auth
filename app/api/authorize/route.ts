@@ -4,7 +4,6 @@ import {
   storeAuthorizationEmail,
 } from "@/utils/authorizationCodeStorage";
 import { generateCodeVerifier } from "@/utils/pkce";
-import { setUserToken } from "@/utils/stograte";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
@@ -29,11 +28,6 @@ export async function POST(req: NextRequest) {
   const authorization_code = generateCodeVerifier();
 
   storeAuthorizationCode(authorization_code, oauth.code_challenge);
-  console.log(
-    "=> ~ POST ~ storeAuthorizationCode:",
-    authorization_code,
-    oauth.code_challenge
-  );
   storeAuthorizationEmail(authorization_code, email);
 
   const res = NextResponse.json({ code: authorization_code });

@@ -49,6 +49,12 @@ export default function Home() {
                   />
                 </svg>
               </Link>
+              <Link
+                href="/login"
+                className="inline-flex items-center justify-center gap-2 px-7 py-3.5 bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-semibold rounded-xl border-2 border-slate-200 dark:border-slate-700 hover:border-emerald-400/50 dark:hover:border-emerald-500/50 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-all duration-300"
+              >
+                Đăng nhập
+              </Link>
               <a
                 href="https://github.com"
                 target="_blank"
