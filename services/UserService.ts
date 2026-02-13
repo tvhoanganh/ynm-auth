@@ -1,6 +1,6 @@
 import { injectable, inject } from "tsyringe";
-import { SL_API_URL } from "@/constants/SL_API_DOMAIN";
-import { AuthService } from "./AuthService";
+import { HttpServiceFactory } from "./HttpServiceFactory";
+import { RequestTokenService } from "./RequestTokenService";
 
 export interface UserProfile {
   id: number | string;
@@ -20,57 +20,61 @@ export interface UserProfile {
  */
 @injectable()
 export class UserService {
-  constructor(@inject(AuthService) private authService: AuthService) {}
+  constructor(
+    @inject(HttpServiceFactory)
+    private readonly httpServiceFactory: HttpServiceFactory,
+    @inject(RequestTokenService)
+    private readonly requestTokenService: RequestTokenService,
+  ) {}
 
-  public async getProfile(token: string): Promise<UserProfile> {
-    const res = await fetch(`${SL_API_URL}/users/self`, {
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-    });
-
-    if (!res.ok) {
-      throw new Error("Failed to fetch user profile");
+  private async resolveSlApiToken(token?: string): Promise<string> {
+    if (token) {
+      return token;
     }
 
-    return await res.json();
+    return this.requestTokenService.getSlApiTokenOrThrow();
+  }
+
+  public async getProfile(token?: string): Promise<UserProfile> {
+    const resolvedToken = await this.resolveSlApiToken(token);
+    const client = this.httpServiceFactory.getClientWithBearer(
+      "slApi",
+      resolvedToken,
+    );
+
+    return client.get<UserProfile>("/users/self");
   }
 
   public async updateProfile(
-    token: string,
-    updates: Partial<UserProfile>
+    token: string | undefined,
+    updates: Partial<UserProfile>,
   ): Promise<UserProfile> {
-    const res = await fetch(`${SL_API_URL}/users/self`, {
-      method: "PATCH",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(updates),
-    });
+    const resolvedToken = await this.resolveSlApiToken(token);
+    const client = this.httpServiceFactory.getClientWithBearer(
+      "slApi",
+      resolvedToken,
+    );
 
-    if (!res.ok) {
-      throw new Error("Failed to update user profile");
-    }
-
-    return await res.json();
+    return client.patch<UserProfile, Partial<UserProfile>>(
+      "/users/self",
+      updates,
+    );
   }
 
-  public async searchUsers(token: string, query: string): Promise<UserProfile[]> {
-    const res = await fetch(`${SL_API_URL}/users?search=${encodeURIComponent(query)}`, {
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
+  public async searchUsers(
+    token: string | undefined,
+    query: string,
+  ): Promise<UserProfile[]> {
+    const resolvedToken = await this.resolveSlApiToken(token);
+    const client = this.httpServiceFactory.getClientWithBearer(
+      "slApi",
+      resolvedToken,
+    );
+
+    return client.get<UserProfile[]>("/users", {
+      params: {
+        search: query,
       },
     });
-
-    if (!res.ok) {
-      throw new Error("Failed to search users");
-    }
-
-    return await res.json();
   }
 }

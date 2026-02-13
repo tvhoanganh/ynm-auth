@@ -1,6 +1,6 @@
 "use client";
 
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import { useState } from "react";
 import Link from "next/link";
 import { BlurDecoration } from "@/components/ui/BlurDecoration";
@@ -9,6 +9,7 @@ const DEFAULT_REDIRECT = "/profile";
 
 export function LoginForm() {
   const searchParams = useSearchParams();
+  const router = useRouter();
   const returnTo =
     searchParams.get("returnTo") || searchParams.get("redirect") || DEFAULT_REDIRECT;
 
@@ -34,8 +35,7 @@ export function LoginForm() {
         setLoading(false);
         return;
       }
-
-      window.location.href = returnTo.startsWith("/") ? returnTo : DEFAULT_REDIRECT;
+      router.replace(returnTo.startsWith("/") ? returnTo : DEFAULT_REDIRECT);
     } catch {
       setError("Lỗi kết nối máy chủ");
       setLoading(false);

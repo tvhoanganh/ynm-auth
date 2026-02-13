@@ -10,3 +10,10 @@ export { LoginService } from "./LoginService";
 export { PkceService } from "./PkceService";
 export { RedisService } from "./RedisService";
 export { SsoService } from "./SsoService";
+export { RequestTokenService } from "./RequestTokenService";
+export { HttpService } from "./HttpService";
+export {
+	HTTP_CLIENT_CONFIGS,
+	HttpServiceFactory,
+	type HttpClientConfigMap,
+} from "./HttpServiceFactory";

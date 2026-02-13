@@ -1,4 +1,4 @@
-import { JWT_SECRET } from "@/constants/auth";
+import { JWT_ISSUER, JWT_SECRET } from "@/constants/auth";
 import { SignJWT, jwtVerify, type JWTPayload } from "jose";
 import { injectable } from "tsyringe";
 
@@ -19,7 +19,7 @@ export class JwtService {
   async verifyJwt(
     token: string,
     secret: string = JWT_SECRET,
-    issuer?: string
+    issuer: 'ynm-auth' | 'ynm-sso' = JWT_ISSUER
   ): Promise<{ valid: boolean; payload?: JwtPayload }> {
     try {
       const key = this.encoder.encode(secret);

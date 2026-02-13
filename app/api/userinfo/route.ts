@@ -9,13 +9,13 @@ import {
 import { SL_API_URL } from "@/constants/SL_API_DOMAIN";
 import { container } from "@/services/di-container";
 import { JwtService } from "@/services";
+import { internalServerError, unauthorized } from "@/utils/apiResponse";
 
 export async function GET(req: NextRequest) {
   const token = req.cookies.get(ACCESS_TOKEN_COOKIE_NAME)?.value;
 
-
   if (!token || !JWT_SECRET) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    return unauthorized();
   }
 
   const jwtService = container.resolve(JwtService);
@@ -26,7 +26,7 @@ export async function GET(req: NextRequest) {
   );
 
   if (!valid || !payload?.sub) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    return unauthorized();
   }
 
   const slApiToken = req.cookies.get(SL_API_TOKEN_COOKIE_NAME)?.value;
@@ -54,8 +54,6 @@ export async function GET(req: NextRequest) {
     const userInfo = await res.json();
     return NextResponse.json(userInfo);
   } catch (error) {
-    const message =
-      error instanceof Error ? error.message : "Internal server error";
-    return NextResponse.json({ error: message }, { status: 500 });
+    return internalServerError(error);
   }
 }

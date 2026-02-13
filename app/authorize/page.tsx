@@ -4,15 +4,11 @@ import { AuthorizeBranding } from "./_components/AuthorizeBranding";
 import { cookies } from "next/headers";
 import { redirect, RedirectType } from "next/navigation";
 import { stringify } from "qs";
-import { JwtService, PkceService, SsoService } from "@/services";
+import { PkceService, SsoService } from "@/services";
 import { FLOW_REDIRECT } from "@/constants/oauth";
 import { Spinner } from "@/components/ui/Spinner";
 import { container } from "@/services/di-container";
-import {
-  AUTHORIZATION_SSO_SESSION,
-  JWT_ISSUER,
-  JWT_SECRET,
-} from "@/constants/auth";
+import { AUTHORIZATION_SSO_SESSION } from "@/constants/auth";
 
 export default async function AuthorizePage({
   searchParams,
@@ -32,26 +28,35 @@ export default async function AuthorizePage({
   const paramsResolved = await searchParams;
 
   if (cookieStore.has(AUTHORIZATION_SSO_SESSION)) {
-    const jwtService = container.resolve(JwtService);
+    const ssoService = container.resolve(SsoService);
 
     const { value: session = "" } =
       cookieStore.get(AUTHORIZATION_SSO_SESSION) || {};
 
-    const { valid, payload } = await jwtService.verifyJwt(
-      session,
-      JWT_SECRET,
-      JWT_ISSUER,
-    );
+    const { valid, payload } = await ssoService.verifySsoSessionToken(session);
 
     if (valid && payload && paramsResolved.flow === FLOW_REDIRECT) {
-      const ssoService = container.resolve(SsoService);
       const pkceService = container.resolve(PkceService);
 
       const authorizationCode = pkceService.generateCodeVerifier();
-      await ssoService.storeAuthorizationData(authorizationCode, {
-        email: payload.email as string,
-        codeChallenge: paramsResolved.code_challenge,
-      });
+
+      const [authSsoSession] = await Promise.all([
+        await ssoService.createSsoSessionToken({
+          userId: String(payload.userId),
+          email: payload.email as string,
+        }),
+        await ssoService.storeAuthorizationData(authorizationCode, {
+          email: payload.email as string,
+          codeChallenge: paramsResolved.code_challenge,
+        }),
+      ]);
+
+      cookieStore.set(
+        AUTHORIZATION_SSO_SESSION,
+        authSsoSession,
+        ssoService.getSsoSessionCookieOptions(),
+      );
+
       redirect(`${paramsResolved.redirect_uri}?code=${authorizationCode}`);
     }
 

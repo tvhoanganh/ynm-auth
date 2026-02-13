@@ -1,6 +1,8 @@
 import { injectable } from "tsyringe";
-import { SL_API_URL } from "@/constants/SL_API_DOMAIN";
 import { SlApiAuthResponse } from "@/types/ISLApiAuthResponse";
+import { inject } from "tsyringe";
+import { HttpServiceFactory } from "./HttpServiceFactory";
+import { RequestTokenService } from "./RequestTokenService";
 
 export interface LoginCredentials {
   email: string;
@@ -19,52 +21,51 @@ export interface AuthResponse {
  */
 @injectable()
 export class AuthService {
+  constructor(
+    @inject(HttpServiceFactory)
+    private readonly httpServiceFactory: HttpServiceFactory,
+    @inject(RequestTokenService)
+    private readonly requestTokenService: RequestTokenService,
+  ) {}
+
+  private async resolveSlApiToken(token?: string): Promise<string> {
+    if (token) {
+      return token;
+    }
+
+    return this.requestTokenService.getSlApiTokenOrThrow();
+  }
+
   public async login(credentials: LoginCredentials): Promise<SlApiAuthResponse> {
-    const res = await fetch(`${SL_API_URL}/authentication`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
+    const client = this.httpServiceFactory.getClient("slApi");
+
+    return client.post<SlApiAuthResponse, Record<string, unknown>>(
+      "/authentication",
+      {
         email: credentials.email,
         password: credentials.password,
         strategy: "local",
-      }),
-    });
-
-    if (!res.ok) {
-      throw new Error("Login failed");
-    }
-
-    return await res.json();
+      },
+    );
   }
 
-  public async logout(token: string): Promise<void> {
+  public async logout(token?: string): Promise<void> {
+    const resolvedToken = await this.resolveSlApiToken(token);
+    const client = this.httpServiceFactory.getClientWithBearer("slApi", resolvedToken);
+
     try {
-      await fetch(`${SL_API_URL}/authentication`, {
-        method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      });
+      await client.delete<unknown>("/authentication");
     } catch (error) {
       console.error("Logout error:", error);
     }
   }
 
-  public async refresh(token: string): Promise<AuthResponse> {
-    const res = await fetch(`${SL_API_URL}/authentication`, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ strategy: "jwt" }),
+  public async refresh(token?: string): Promise<AuthResponse> {
+    const resolvedToken = await this.resolveSlApiToken(token);
+    const client = this.httpServiceFactory.getClientWithBearer("slApi", resolvedToken);
+
+    return client.post<AuthResponse, { strategy: string }>("/authentication", {
+      strategy: "jwt",
     });
-
-    if (!res.ok) {
-      throw new Error("Token refresh failed");
-    }
-
-    return await res.json();
   }
 }

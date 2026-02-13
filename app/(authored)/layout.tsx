@@ -3,26 +3,35 @@ import { UserProvider } from "./_components/UserContext";
 import { fetchUserProfile, getAuthContext } from "@/utils/auth";
 import { UserProfile } from "@/types/UserProfile";
 
+
 export default async function AuthenticatedLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const auth = await getAuthContext()
   let initialUser: UserProfile | null = null;
   let initialError: string | null = null;
 
-  console.log("Auth Context in Layout:", auth);
+  try {
+    const auth = await getAuthContext();
+    initialUser = await fetchUserProfile(auth.userId);
+  } catch {
+    initialError = "FETCH_PROFILE_FAILED";
+  }
 
-  if (auth.isAuthenticated) {
-    const profile = await fetchUserProfile(auth.userId);
-    if (profile) {
-      initialUser = profile as UserProfile;
-    } else {
-      initialError = "Khong the tai thong tin nguoi dung";
-    }
-  } else {
-    initialError = "Unauthorized";
+  if (initialError) {
+    return (
+      <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex items-center justify-center px-6">
+        <div className="max-w-md w-full rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 text-center">
+          <h1 className="text-lg font-semibold text-slate-900 dark:text-slate-100">
+            Có lỗi xảy ra
+          </h1>
+          <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">
+            Vui lòng refresh lại trang để thử lại.
+          </p>
+        </div>
+      </div>
+    );
   }
 
   return (

@@ -26,7 +26,7 @@ export async function getAuthContext(): Promise<AuthContext> {
   }
 
   const jwtService = container.resolve(JwtService);
-  const { valid, payload } = await jwtService.verifyJwt(token, JWT_SECRET, JWT_ISSUER);
+  const { valid, payload } = await jwtService.verifyJwt(token);
   if (!valid || !payload?.sub) {
     return { userId: "", email: "", isAuthenticated: false };
   }

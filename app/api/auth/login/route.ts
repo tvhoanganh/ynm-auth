@@ -6,6 +6,7 @@ import {
 } from "@/constants/auth";
 import { container } from "@/services/di-container";
 import { AuthService, LoginService } from "@/services";
+import { internalServerError } from "@/utils/apiResponse";
 
 export async function POST(req: NextRequest) {
   const { email, password } = await req.json();
@@ -26,27 +27,21 @@ export async function POST(req: NextRequest) {
     // Step 3: Build response with cookies
     const res = NextResponse.json(user);
 
-    // Set internal access token cookie
-    res.cookies.set(ACCESS_TOKEN_COOKIE_NAME, internalToken, {
+    const cookieOptions = {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       path: "/",
-      sameSite: "lax",
-    });
+      sameSite: "lax" as const,
+    };
+
+    // Set internal access token cookie
+    res.cookies.set(ACCESS_TOKEN_COOKIE_NAME, internalToken, cookieOptions);
 
     // Set SL_API access token cookie for backend calls
-    res.cookies.set(SL_API_TOKEN_COOKIE_NAME, slApiToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      path: "/",
-      sameSite: "lax",
-    });
+    res.cookies.set(SL_API_TOKEN_COOKIE_NAME, slApiToken, cookieOptions);
 
     return res;
   } catch (error) {
-    const message =
-      error instanceof Error ? error.message : "Internal server error";
-
-    return NextResponse.json({ error: message });
+    return internalServerError(error);
   }
 }
