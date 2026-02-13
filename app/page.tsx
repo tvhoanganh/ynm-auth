@@ -25,8 +25,8 @@ export default function Home() {
               của bạn
             </h1>
             <p className="text-lg sm:text-xl text-slate-600 dark:text-slate-400 mb-10 max-w-2xl mx-auto leading-relaxed">
-              Nền tảng Account ID giúp bạn quản lý hồ sơ cá nhân và xác thực OAuth
-              an toàn. Một tài khoản duy nhất để đăng nhập mọi nơi.
+              Nền tảng Account ID giúp bạn quản lý hồ sơ cá nhân và xác thực
+              OAuth an toàn. Một tài khoản duy nhất để đăng nhập mọi nơi.
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -49,20 +49,6 @@ export default function Home() {
                   />
                 </svg>
               </Link>
-              <Link
-                href="/login"
-                className="inline-flex items-center justify-center gap-2 px-7 py-3.5 bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-semibold rounded-xl border-2 border-slate-200 dark:border-slate-700 hover:border-emerald-400/50 dark:hover:border-emerald-500/50 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-all duration-300"
-              >
-                Đăng nhập
-              </Link>
-              <a
-                href="https://github.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center justify-center gap-2 px-7 py-3.5 bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-semibold rounded-xl border-2 border-slate-200 dark:border-slate-700 hover:border-emerald-400/50 dark:hover:border-emerald-500/50 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-all duration-300"
-              >
-                Tìm hiểu thêm
-              </a>
             </div>
           </div>
         </section>
@@ -74,8 +60,8 @@ export default function Home() {
               Tính năng chính
             </h2>
             <p className="text-slate-600 dark:text-slate-400 text-center max-w-xl mx-auto mb-14">
-              Mọi thứ bạn cần để quản lý Account ID và kết nối an toàn với các ứng
-              dụng.
+              Mọi thứ bạn cần để quản lý Account ID và kết nối an toàn với các
+              ứng dụng.
             </p>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
               <FeatureCard
@@ -136,13 +122,13 @@ export default function Home() {
                   </h2>
                 </div>
                 <p className="text-slate-300 leading-relaxed mb-4">
-                  Chúng tôi cam kết bảo vệ thông tin cá nhân của bạn với các tiêu
-                  chuẩn bảo mật cao nhất. Mọi dữ liệu được mã hóa và lưu trữ an
-                  toàn.
+                  Chúng tôi cam kết bảo vệ thông tin cá nhân của bạn với các
+                  tiêu chuẩn bảo mật cao nhất. Mọi dữ liệu được mã hóa và lưu
+                  trữ an toàn.
                 </p>
                 <p className="text-slate-400 leading-relaxed">
-                  OAuth cho phép bạn chia sẻ quyền truy cập có kiểm soát mà không
-                  cần chia sẻ mật khẩu.
+                  OAuth cho phép bạn chia sẻ quyền truy cập có kiểm soát mà
+                  không cần chia sẻ mật khẩu.
                 </p>
               </div>
             </div>

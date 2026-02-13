@@ -1,19 +1,27 @@
+import { tv } from "tailwind-variants";
+
 interface ProfileMessageProps {
   type: "success" | "error";
   text: string;
 }
 
+const message = tv({
+  base: "px-6 py-3.5 border-b flex items-center gap-2",
+  variants: {
+    type: {
+      success:
+        "bg-emerald-50 dark:bg-emerald-500/10 border-emerald-200/60 dark:border-emerald-500/20 text-emerald-800 dark:text-emerald-300",
+      error:
+        "bg-red-50 dark:bg-red-500/10 border-red-200/60 dark:border-red-500/20 text-red-800 dark:text-red-300",
+    },
+  },
+});
+
 /** Server component: inline message/alert for profile form */
 export function ProfileMessage({ type, text }: ProfileMessageProps) {
   const isSuccess = type === "success";
   return (
-    <div
-      className={`px-6 py-3.5 border-b flex items-center gap-2 ${
-        isSuccess
-          ? "bg-emerald-50 dark:bg-emerald-500/10 border-emerald-200/60 dark:border-emerald-500/20 text-emerald-800 dark:text-emerald-300"
-          : "bg-red-50 dark:bg-red-500/10 border-red-200/60 dark:border-red-500/20 text-red-800 dark:text-red-300"
-      }`}
-    >
+    <div className={message({ type })}>
       {isSuccess ? (
         <svg
           className="w-5 h-5 shrink-0"

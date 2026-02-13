@@ -8,7 +8,10 @@ type JwtPayload = JWTPayload & Record<string, unknown>;
 export class JwtService {
   private encoder = new TextEncoder();
 
-  async signJwt(payload: JwtPayload, secret: string = JWT_SECRET): Promise<string> {
+  async signJwt(
+    payload: JwtPayload,
+    secret: string = JWT_SECRET,
+  ): Promise<string> {
     const key = this.encoder.encode(secret);
 
     return new SignJWT(payload)
@@ -19,13 +22,14 @@ export class JwtService {
   async verifyJwt(
     token: string,
     secret: string = JWT_SECRET,
-    issuer: 'ynm-auth' | 'ynm-sso' = JWT_ISSUER
+    issuer: "ynm-auth" | "ynm-sso" = JWT_ISSUER,
   ): Promise<{ valid: boolean; payload?: JwtPayload }> {
     try {
       const key = this.encoder.encode(secret);
       const { payload } = await jwtVerify(token, key, issuer ? { issuer } : {});
       return { valid: true, payload: payload as JwtPayload };
-    } catch {
+    } catch (err){
+      console.error("JWT verification error:", err);
       return { valid: false };
     }
   }

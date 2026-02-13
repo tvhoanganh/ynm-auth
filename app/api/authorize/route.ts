@@ -9,7 +9,7 @@ export async function POST(req: NextRequest) {
 
   const authService = container.resolve(AuthService);
 
-  const user = await authService.login({ email, password });
+  const { user } = await authService.login({ email, password });
 
   if (!user) {
     return invalidCredentials();

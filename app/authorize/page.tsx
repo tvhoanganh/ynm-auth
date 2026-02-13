@@ -2,8 +2,7 @@ import { Suspense } from "react";
 import { AuthorizeForm } from "./_components/AuthorizeForm";
 import { AuthorizeBranding } from "./_components/AuthorizeBranding";
 import { cookies } from "next/headers";
-import { redirect, RedirectType } from "next/navigation";
-import { stringify } from "qs";
+import { redirect } from "next/navigation";
 import { PkceService, SsoService } from "@/services";
 import { FLOW_REDIRECT } from "@/constants/oauth";
 import { Spinner } from "@/components/ui/Spinner";
@@ -37,35 +36,16 @@ export default async function AuthorizePage({
 
     if (valid && payload && paramsResolved.flow === FLOW_REDIRECT) {
       const pkceService = container.resolve(PkceService);
-
       const authorizationCode = pkceService.generateCodeVerifier();
 
-      const [authSsoSession] = await Promise.all([
-        await ssoService.createSsoSessionToken({
-          userId: String(payload.userId),
-          email: payload.email as string,
-        }),
-        await ssoService.storeAuthorizationData(authorizationCode, {
-          email: payload.email as string,
-          codeChallenge: paramsResolved.code_challenge,
-        }),
-      ]);
-
-      cookieStore.set(
-        AUTHORIZATION_SSO_SESSION,
-        authSsoSession,
-        ssoService.getSsoSessionCookieOptions(),
-      );
+      await ssoService.storeAuthorizationData(authorizationCode, {
+        email: payload.email as string,
+        codeChallenge: paramsResolved.code_challenge,
+      });
 
       redirect(`${paramsResolved.redirect_uri}?code=${authorizationCode}`);
     }
 
-    if (valid && payload) {
-      redirect(
-        `/authorize/success?${stringify(paramsResolved)}`,
-        RedirectType.push,
-      );
-    }
   }
 
   return (
